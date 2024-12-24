@@ -1,30 +1,36 @@
 import random as rand
 
-class Hjälte:
-    def __init__(self,Hname , Hhealth, Hattack, Hinventory, Hutrustning ,Hnivå, Hxp):
+class Hero:
+    def __init__(self,Hname , Hhealth, Hattack, Hinventory, Hutrustning ,Hlvl, Hxp):
         self.name = Hname
         self.health = Hhealth
         self.attack = Hattack
         self.inventory = Hinventory
         self.utrustning = Hutrustning
-        self.nivå = Hnivå
+        self.lvl = Hlvl
         self.xp = Hxp
 
 
    
     def getall(self):
-        print(f"Din hälsa är {self.health} hp ")
-        print(f"Din styrka är {self.attack} ")
-        print(f"Din level är {self.nivå} ")
-        #Funktion som skriver ut dina stats
-    
+        print(f"""
+        === Spelarstatistik ===
+        Namn: {self.name}
+        Hälsa: {self.health} HP
+        Styrka: {self.attack}
+        Level: {self.lvl}
+        XP: {self.xp}
+        """)
+
+            #Funktion som skriver ut dina stats
+        
     def setHealth(self, newHealth):
-        self.health + newHealth
+        self.health += newHealth
     def setAttack(self, newAttack):
         self.attack = newAttack
-    def setLvl(self, newNivå):
-        self.lvl = newNivå
-    #Klassen för spelaren
+    def setLvl(self, newLvl):
+        self.lvl = newLvl
+        #Klassen för spelaren
 
 class Monster:
     def __init__(self, Mname, Mhealth, Mattack):
@@ -33,69 +39,58 @@ class Monster:
         self.name = Mname
     #Klass för monster
 
-def skapah():
+def createH():
     name = str(input("Välj ett namn för din hjälte \n"))
     Hinventory = ["Potion", "Potion", "Potion"]     
     Hutrustning = []
-    Player = Hjälte(name, rand.randint(12,22), rand.randint(7,10), Hinventory, Hutrustning ,0, 0 )
-    Player.getall()
-    return Player
-    #Funktion för att skapa sin gubbe
+    player = Hero(name, rand.randint(12,22), rand.randint(7,10), Hinventory, Hutrustning ,0, 0 )
+    player.getall()
+    return player
+    #Funktion för att create sin gubbe
 
-def skapam1():
+def createM1():
     monsterna = ["Spöke", "Skelet", "Varg",]
     name = rand.choice(monsterna)
     monster1 = Monster(name, rand.randint(10,15), rand.randint(2,4))
     return monster1
-    #Funktion för att skapa monster
+    #Funktion för att create monster
 
-def skapam2():
+def createM2():
     monsterna = ["Djävul", "Ork", "Vampyr",]
     name = rand.choice(monsterna)
     monster2 = Monster(name, rand.randint(16,22), rand.randint(4,6))
     return monster2
     #Funktion för starkare monster när man når en viss level
 
-def skapaboss():
+def createboss():
     monster = Monster("Darkwing", 30, 10)
     return monster
-    #Funktion för att skapa den sista bossen
+    #Funktion för att create den sista bossen
 
-def level(Player):
-    Player.xp += rand.randint(10,20)
-    if Player.xp < 10:
-        Player.nivå = 1
-        Player.attack += 1
-    elif 10 < Player.xp <20:
-        Player.nivå = 2
-        Player.health += 2
-    elif 20 < Player.xp <30:
-        Player.nivå = 3
-        Player.attack += 1
-    elif 30 < Player.xp < 40:
-        Player.nivå = 4
-        Player.health += 2
-    elif 40 < Player.xp < 50:
-        Player.nivå  = 5
-        Player.attack += 1
-    elif 50 < Player.xp < 60:
-        Player.nivå = 6
-        Player.health += 2
-    elif 60 < Player.xp < 70:
-        Player.nivå = 7
-        Player.attack += 1
-    elif 70 < Player.xp < 80:
-        Player.nivå = 8
-        Player.health += 2
-    elif 80 < Player.xp <90:
-        Player.nivå = 9
-        Player.attack += 2
-    elif Player.xp >= 100:
-        Player.nivå = 10
-    return Player
-    #Funktion för vårt level system
+def level(player):
+    xp_threshold = 10  
+    attack_increase = 1 
+    health_increase = 2 
+    
+    next_level = player.lvl + 1  
+    
+    if player.xp >= next_level * xp_threshold:
+        player.lvl = next_level
+        player.xp -= next_level * xp_threshold  # Ta bort förbrukad XP
+
+        # Dynamiska attributuppdateringar
+        if player.lvl % 2 == 0:  # Jämna levels förbättrar HP
+            player.health += health_increase
+        else:  # Ojämna levels förbättrar attack
+            player.attack += attack_increase
         
-def potion(Player):
+        print(f"{player.name} nådde Level {player.lvl}!")
+        print(f"HP: {player.health}, Attack: {player.attack}, XP kvar tills nästa level: {player.xp}")
+    
+    return player
+    #Funktion för level system
+        
+def potion(player):
     p_svar = input("""
 Vill du ta en potion?
 
@@ -105,66 +100,71 @@ Tryck [H] för att dricka en healing potion
                     """)
     p_svar = p_svar.lower()
     if p_svar == "h":
-        if "Potion" in Player.inventory:
-            Player.health += 10
-            Player.inventory.remove("Potion")
+        if "Potion" in player.inventory:
+            player.health += 10
+            player.inventory.remove("Potion")
             print("Du drack en potion och fick 10 hp ")
         else:
             print("Du har inga healing potions ")
 
     elif p_svar == "s":
-        if "Styrka Potion" in Player.inventory:
-            Player.attack += 4
+        if "Styrka Potion" in player.inventory:
+            player.attack += 4
             print("Du drack en styrka potion ")
-            print(f' Din attack är nu {Player.attack}')
+            print(f' Din attack är nu {player.attack}')
         else: 
             print("Du har inga styrka potions ")
             pass
     #Funktion för att använda potions
 
-    return Player
+    return player
     
-def equip(Player):
-    if len(Player.utrustning) == 0:
+def equip(player):
+    if len(player.utrustning) == 0:
         print("Du har ingen utrustning att sätta på \n")
         pass
-    elif len(Player.utrustning) > 0:
+    elif len(player.utrustning) > 0:
         equip_svar = input("Vill du sätta på utrustning y/n \n ")
         equip_svar = equip_svar.lower()
         if equip_svar == "y":
-            print(Player.utrustning)
+            print(player.utrustning)
             equi_svar = input("Svärd = [S] Armor = [A] Lie = [L] Yxa = [Y]")
             equi_svar = equi_svar.lower()
             if equi_svar == "s":
-                Player.attack += 5
-                Player.utrustning.remove("järn svärd")
-                print(f'Din styrka är nu {Player.attack}')
+                player.attack += 5
+                player.utrustning.remove("järn svärd")
+                print(f'Din styrka är nu {player.attack}')
             elif equi_svar == "a":
-                Player.health += 10
-                Player.utrustning.remove("armor")
-                print(f'Din hp är nu {Player.health}')
+                player.health += 10
+                player.utrustning.remove("armor")
+                print(f'Din hp är nu {player.health}')
             elif equi_svar == "l":
-                Player.attack += 6
-                Player.utrustning.remove("lie")
-                print(f'Din styrka är nu {Player.attack}')
+                player.attack += 6
+                player.utrustning.remove("lie")
+                print(f'Din styrka är nu {player.attack}')
             elif equi_svar == "y":
-                Player.attack += 6
-                Player.utrustning.remove("yxa")
-                print(f'Din styrka är nu {Player.attack}')
+                player.attack += 6
+                player.utrustning.remove("yxa")
+                print(f'Din styrka är nu {player.attack}')
             else:
                 print("Välj ett riktigt alternativ")
     
-    return Player
+    return player
         #Funktion för att sätta på sin utrustning man finner i kistorna
 
 
-def fight(Player, monster):
+def fight(player, monster):
     while True:
         if monster.health <= 0:
-            print(f"{Player.name} dödade {monster.name}")
+            print(f"{player.name} dödade {monster.name}")
             print("Du vann striden")
-            Player = level(Player)
-            return Player
+
+            xp_gained = rand.randint(10, 20)
+            player.xp += xp_gained
+            print(f"Du fick {xp_gained} XP!")
+            
+            player = level(player)  # Uppdatera spelarens nivå
+            return player
             
 
 
@@ -173,21 +173,21 @@ def fight(Player, monster):
         
 
         if fight_svar == "l":
-            Player.attack = Player.attack * 1
-            monster.health = monster.health - Player.attack
+            player.attack = player.attack * 1
+            monster.health = monster.health - player.attack
             if monster.health < 0:
-                print(f"Du gjorde {Player.attack} damage, {monster.name} har 0 hp kvar ")
+                print(f"Du gjorde {player.attack} damage, {monster.name} har 0 hp kvar ")
             else:
-                print(f"Du gjorde {Player.attack} damage, {monster.name} har {monster.health} hp kvar. ")
+                print(f"Du gjorde {player.attack} damage, {monster.name} har {monster.health} hp kvar. ")
 
 
 
 
         elif fight_svar == "p":
-            Player = potion(Player)
+            player = potion(player)
 
         elif fight_svar == "s":
-            stark_attack = Player.attack * 1.5
+            stark_attack = player.attack * 1.5
             print(f'Du gick för en stark attack')
             stark_chans = rand.randint(1,4)
             if stark_chans == 3:
@@ -196,9 +196,12 @@ def fight(Player, monster):
                 monster.health = monster.health - stark_attack
                 print(f'Du gjorde {stark_attack}, {monster.name} har {monster.health} hp kvar. ')
             elif monster.health < 0:
-                print(f"Du gjorde {Player.attack} och {monster.name} har 0 hp kvar. ")
-        else:
-            print("Du förlora din attack")
+                print(f"Du gjorde {player.attack} och {monster.name} har 0 hp kvar. ")
+
+        while fight_svar not in ["l", "s", "p"]:
+            print("Felaktig input, försök igen!")
+            fight_svar = input("Tryck [L], [S], eller [P]: ").lower()
+
                 
         print("---------------------------------------------------------------------------------------------------------------------------")
         
@@ -217,12 +220,12 @@ def fight(Player, monster):
                 print("---------------------------------------------------------------------------------------------------------------------")
               
             if dodge_svar == "d" and monster.health > 0 and dodge_chans != 3:
-                print(f"{monster.name} träffade dig ändå och gjorde {monster.attack} damage, Du har {Player.health} hp kvar")
-                Player.health = Player.health - monster.attack
+                print(f"{monster.name} träffade dig ändå och gjorde {monster.attack} damage, Du har {player.health} hp kvar")
+                player.health = player.health - monster.attack
     #Funktion som är vårt fight system där man kan dodgea, heala, öka din attack eller slåss mot monstret.
         
 
-def lotta(Player, monster):
+def lotta(player, monster):
     kista = ["Potion", "Järn svärd", "Armor", "Styrka Potion", "Lie", "Yxa"]
     fällor = ["Det sköts av 8 pillar", "Du andades in giftig rök", "Det kom spjut från golvet", "Du gick i en björn fälla"]
     kista_chans = rand.choice(kista)
@@ -234,47 +237,47 @@ def lotta(Player, monster):
         kista_svar = str(input("Vill du öppna kistan y/n \n"))
         kista_svar.lower()
         if kista_svar == "y":
-            print(f"{Player.name} öppnade kistan och hittade " + kista_chans)
+            print(f"{player.name} öppnade kistan och hittade " + kista_chans)
             if kista_chans == "Järn svärd":
-                Player.utrustning.append("järn svärd")
+                player.utrustning.append("järn svärd")
                 print("Järn svärdet ökar din attack med 5 \n")
             elif kista_chans == "Lie":
-                Player.utrustning.append("lie")
+                player.utrustning.append("lie")
                 print("Lien ökar din attack med 6 \n ")
                 kista.remove(kista_chans)
             elif kista_chans == "Yxa":
-                Player.utrustning.append("yxa")
+                player.utrustning.append("yxa")
                 print("Yxan ökar din attack med 6 \n")
             elif kista_chans == "Armor":
-                Player.utrustning.append("armor")
+                player.utrustning.append("armor")
                 print("Armorn ökar ditt hp med 10 \n")
                 kista.remove(kista_chans)
             elif kista_chans == "Styrka Potion":
-                Player.inventory.append("Styrka Potion \n")
+                player.inventory.append("Styrka Potion \n")
             elif kista_chans == "Potion":
-                Player.inventory.append("Potion \n")
+                player.inventory.append("Potion \n")
 
         elif kista_svar == "n":
-            print(f"{Player.name} valde att inte öppna kistan och gick vidare")
+            print(f"{player.name} valde att inte öppna kistan och gick vidare")
         else:
             print("Felaktig input")
             pass
 
-        return Player.inventory
+        return player.inventory
 
     elif chance == 2:
         print("Du möttes av en fälla \n")
         print(fälla_chans)
-        Player.health = Player.health - 4
+        player.health = player.health - 4
         print("Du tog 4 dmg")
-        print(f"Du har {Player.health} hp kvar")
-        return Player.health
+        print(f"Du har {player.health} hp kvar")
+        return player.health
            
         
         
     elif chance >= 3:
-        if Player.nivå <= 5:
-            monster = skapam1()
+        if player.lvl <= 5:
+            monster = createM1()
             print(f'Du möttes av en {monster.name}')
             if monster.name == "Varg":
                 print("""
@@ -295,7 +298,7 @@ def lotta(Player, monster):
 
                 
                 """)
-                fight(Player, monster)
+                fight(player, monster)
             elif monster.name == "Spöke":
                 print("""
 
@@ -319,7 +322,7 @@ def lotta(Player, monster):
 
 
             """)
-                fight(Player, monster)
+                fight(player, monster)
             elif monster.name == "Skelet":
                 print(""""
 
@@ -341,9 +344,9 @@ def lotta(Player, monster):
                           ░░░└┴┴┴┴┴┴┴┘░░░
                             ░░░░░░░░░░░
             """)
-                fight(Player, monster)
+                fight(player, monster)
         else:
-            monster = skapam2()
+            monster = createM2()
             print(f'Du möttes av en {monster.name}')
         if monster.name == "Ork":
             print("""
@@ -370,7 +373,7 @@ def lotta(Player, monster):
 
             """)
     
-            fight(Player, monster)
+            fight(player, monster)
         elif monster.name == "Vampyr":
             print("""
             
@@ -392,7 +395,7 @@ def lotta(Player, monster):
                 .'       `.         .'       `.
             .'           `-.   .-'           `.
             """)
-            fight(Player, monster)
+            fight(player, monster)
         elif monster.name == "Djävul":
             print("""
             
@@ -415,35 +418,35 @@ def lotta(Player, monster):
                         `-._,-'   `-._______,-'   `-._,-'
 
             """)
-            fight(Player, monster)
+            fight(player, monster)
     #Funktion för olika utfall när man fortsätter gå längre in i grottan.
 
-def vägval(Player, monster):
+def vägval(player, monster):
     väg = str(input("Välj om du vill gå höger [R], vänster [L] eller i mitten [M] \n"))
     väg = väg.lower()
     if väg == "r":
-        print(f"{Player.name} gick höger ")
-        lotta(Player, monster)
+        print(f"{player.name} gick höger ")
+        lotta(player, monster)
     elif väg == "l":
-        print(f"{Player.name} gick vänster ")
-        lotta(Player, monster)
+        print(f"{player.name} gick vänster ")
+        lotta(player, monster)
     elif väg == "m":
-        print(f"{Player.name} gick framåt ")
-        lotta(Player, monster)
+        print(f"{player.name} gick framåt ")
+        lotta(player, monster)
 
-    return Player
+    return player
     #Funktion för slumpgöra vad som händer 
 
 def meny():
-    Player = skapah()
-    Boss = skapaboss()
-    monster = skapam1()
-    monster = skapam2()
+    player = createH()
+    boss = createboss()
+    monster = createM1()
+    monster = createM2()
     
     print(f"{player.name} går in i grottan")
 
-    while Player.health > 0:
-        if Player.nivå == 10:
+    while player.health > 0:
+        if player.lvl == 10:
             print("Du möttes av en gigantisk drake, för att lämna grottan så måste du besegra den")
             print("""
                             
@@ -497,9 +500,9 @@ def meny():
 
 
             """)
-            fight(Player, Boss)
-            if Boss.health < 0:
-                print(f"{Player.name} dödade bossen och klara spelet ")
+            fight(player, boss)
+            if boss.health < 0:
+                print(f"{player.name} dödade bossen och klara spelet ")
                 break
         
             
@@ -512,15 +515,15 @@ def meny():
         """))
         val = val.lower()
         if val == "i":
-            print(Player.inventory)
-            print(Player.utrustning)
-            player = equip(Player)
+            print(player.inventory)
+            print(player.utrustning)
+            player = equip(player)
         elif val == "s":
-            Player.getall()
+            player.getall()
         elif val == "p":
-            Player = potion(Player)
+            player = potion(player)
         elif val == "f":
-            Player = vägval(Player, monster)
+            player = vägval(player, monster)
         elif val == "a":
             print("Nu avslutas spelet \n")
             break
